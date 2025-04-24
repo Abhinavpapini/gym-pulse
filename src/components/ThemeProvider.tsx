@@ -24,9 +24,12 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState)
 
 export function ThemeProvider({
   children,
-  defaultTheme = "light",
+  defaultTheme = "dark",
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(defaultTheme)
+  const [theme, setTheme] = useState<Theme>(() => {
+    const savedTheme = localStorage.getItem("theme");
+    return savedTheme === "light" || savedTheme === "dark" ? savedTheme : "dark"; // Default to dark
+  });
 
   useEffect(() => {
     const root = window.document.documentElement
