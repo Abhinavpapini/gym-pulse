@@ -30,8 +30,15 @@ export function ThemeProvider({
 
   useEffect(() => {
     const root = window.document.documentElement
+    
+    // Remove both classes first
     root.classList.remove("light", "dark")
+    
+    // Add the current theme class
     root.classList.add(theme)
+    
+    // Also set data-theme attribute for components that might use it
+    root.setAttribute("data-theme", theme)
   }, [theme])
 
   const toggleTheme = () => {

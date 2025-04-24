@@ -10,6 +10,12 @@ const Settings = () => {
   const { theme, toggleTheme } = useTheme();
   const [notifications, setNotifications] = useState(true);
 
+  const handleThemeChange = (checked: boolean) => {
+    // Save preference to localStorage
+    localStorage.setItem("theme", checked ? "dark" : "light");
+    toggleTheme();
+  };
+
   return (
     <AppLayout>
       <div className="container mx-auto py-8">
@@ -50,7 +56,7 @@ const Settings = () => {
                 </div>
                 <Switch
                   checked={theme === "dark"}
-                  onCheckedChange={toggleTheme}
+                  onCheckedChange={handleThemeChange}
                 />
               </div>
             </CardContent>
