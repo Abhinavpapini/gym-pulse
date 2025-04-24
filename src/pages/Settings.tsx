@@ -1,13 +1,13 @@
 
-import { useState } from "react";
 import { Bell, Moon, Sun } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AppLayout from "@/components/AppLayout";
+import { useTheme } from "@/components/ThemeProvider";
 
 const Settings = () => {
+  const { theme, toggleTheme } = useTheme();
   const [notifications, setNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
 
   return (
     <AppLayout>
@@ -40,7 +40,7 @@ const Settings = () => {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  {darkMode ? (
+                  {theme === "dark" ? (
                     <Moon className="h-5 w-5" />
                   ) : (
                     <Sun className="h-5 w-5" />
@@ -48,8 +48,8 @@ const Settings = () => {
                   <span>Dark Mode</span>
                 </div>
                 <Switch
-                  checked={darkMode}
-                  onCheckedChange={setDarkMode}
+                  checked={theme === "dark"}
+                  onCheckedChange={toggleTheme}
                 />
               </div>
             </CardContent>

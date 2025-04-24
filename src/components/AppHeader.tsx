@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { 
@@ -7,25 +6,19 @@ import {
   CircleUser, 
   Home, 
   MenuIcon, 
+  Moon,
   PieChart, 
   Settings, 
+  Sun,
   User, 
   X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { useTheme } from "./ThemeProvider";
 
 const AppHeader = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-  };
+  const { theme, toggleTheme } = useTheme();
 
   const navItems = [
     { title: "Dashboard", path: "/", icon: <Home className="h-4 w-4" /> },
@@ -35,7 +28,7 @@ const AppHeader = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white border-b shadow-sm">
+    <header className="sticky top-0 z-40 w-full bg-background border-b shadow-sm">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
@@ -64,6 +57,19 @@ const AppHeader = () => {
 
           {/* User actions */}
           <div className="flex items-center space-x-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="mr-2"
+            >
+              {theme === "dark" ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+            </Button>
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="hidden md:flex items-center">
