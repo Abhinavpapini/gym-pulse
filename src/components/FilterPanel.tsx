@@ -23,10 +23,10 @@ export interface FilterOptions {
 const FilterPanel = ({ onFilterChange }: FilterPanelProps) => {
   const [filters, setFilters] = useState<FilterOptions>({
     search: "",
-    gender: "",
-    membershipType: "",
+    gender: "all",
+    membershipType: "all",
     ageRange: [18, 65],
-    workoutType: "",
+    workoutType: "all",
   });
 
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
@@ -45,8 +45,8 @@ const FilterPanel = ({ onFilterChange }: FilterPanelProps) => {
       // Remove previous filter of the same key if exists
       const filtered = prev.filter(f => !f.startsWith(`${key}:`));
       
-      // Only add non-empty values
-      if (value === "" || (Array.isArray(value) && value[0] === 18 && value[1] === 65)) {
+      // Only add non-empty values or non-"all" values
+      if (value === "" || value === "all" || (Array.isArray(value) && value[0] === 18 && value[1] === 65)) {
         return filtered;
       }
 
@@ -69,7 +69,7 @@ const FilterPanel = ({ onFilterChange }: FilterPanelProps) => {
       newFilters.ageRange = [18, 65];
     } else {
       // @ts-ignore: Dynamic key assignment
-      newFilters[key as keyof FilterOptions] = "";
+      newFilters[key as keyof FilterOptions] = "all";
     }
     
     setFilters(newFilters);
@@ -82,10 +82,10 @@ const FilterPanel = ({ onFilterChange }: FilterPanelProps) => {
   const clearAllFilters = () => {
     const resetFilters: FilterOptions = {
       search: "",
-      gender: "",
-      membershipType: "",
+      gender: "all",
+      membershipType: "all",
       ageRange: [18, 65],
-      workoutType: "",
+      workoutType: "all",
     };
     setFilters(resetFilters);
     onFilterChange(resetFilters);
@@ -125,7 +125,7 @@ const FilterPanel = ({ onFilterChange }: FilterPanelProps) => {
               <SelectValue placeholder="All genders" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All genders</SelectItem>
+              <SelectItem value="all">All genders</SelectItem>
               <SelectItem value="Male">Male</SelectItem>
               <SelectItem value="Female">Female</SelectItem>
             </SelectContent>
@@ -142,7 +142,7 @@ const FilterPanel = ({ onFilterChange }: FilterPanelProps) => {
               <SelectValue placeholder="All memberships" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All memberships</SelectItem>
+              <SelectItem value="all">All memberships</SelectItem>
               <SelectItem value="Basic">Basic</SelectItem>
               <SelectItem value="Premium">Premium</SelectItem>
               <SelectItem value="VIP">VIP</SelectItem>
@@ -160,7 +160,7 @@ const FilterPanel = ({ onFilterChange }: FilterPanelProps) => {
               <SelectValue placeholder="All workouts" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All workouts</SelectItem>
+              <SelectItem value="all">All workouts</SelectItem>
               {workoutTypes.map((type) => (
                 <SelectItem key={type} value={type}>{type}</SelectItem>
               ))}

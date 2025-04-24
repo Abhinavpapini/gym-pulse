@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { User } from "lucide-react";
 import { gymDataService, Member } from "@/services/gymDataService";
@@ -51,12 +50,12 @@ const Members = () => {
       }
       
       // Filter by gender
-      if (filters.gender && member.gender !== filters.gender) {
+      if (filters.gender !== "all" && member.gender !== filters.gender) {
         return false;
       }
       
       // Filter by membership type
-      if (filters.membershipType && member.membershipType !== filters.membershipType) {
+      if (filters.membershipType !== "all" && member.membershipType !== filters.membershipType) {
         return false;
       }
       
@@ -69,7 +68,7 @@ const Members = () => {
       }
       
       // Filter by workout type
-      if (filters.workoutType && member.workoutType !== filters.workoutType) {
+      if (filters.workoutType !== "all" && member.workoutType !== filters.workoutType) {
         return false;
       }
       
