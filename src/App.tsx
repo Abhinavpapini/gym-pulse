@@ -9,6 +9,8 @@ import Members from "./pages/Members";
 import MemberDetail from "./pages/MemberDetail";
 import Analytics from "./pages/Analytics";
 import Reports from "./pages/Reports";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +27,8 @@ const App = () => (
           <Route path="/members/:id" element={<MemberDetail />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/reports" element={<Reports />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
