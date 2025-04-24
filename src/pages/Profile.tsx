@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { User, Mail, Phone, MapPin, CreditCard, Gym, Edit2 } from "lucide-react";
+import { User, Mail, Phone, MapPin, CreditCard, Dumbbell, Edit2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -129,7 +129,7 @@ const Profile = () => {
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-4">
                   <div className="flex items-center space-x-3">
-                    <Gym className="h-5 w-5 text-muted-foreground" />
+                    <Dumbbell className="h-5 w-5 text-muted-foreground" />
                     <span className="font-medium">{profile.gym.name}</span>
                   </div>
                   <div className="flex items-center space-x-3">
