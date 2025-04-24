@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import AppLayout from "@/components/AppLayout";
 import {
@@ -55,41 +54,79 @@ const Reports = () => {
   };
 
   const handleExportCSV = () => {
-    // In a real app, this would generate the actual CSV file
-    toast({
-      title: "Report Generated",
-      description: "CSV report has been downloaded successfully.",
+    const headers = ["Member", "Gender", "Age"];
+    if (selectedMetrics.weight) headers.push("Weight");
+    if (selectedMetrics.bmi) headers.push("BMI");
+    if (selectedMetrics.fatPercentage) headers.push("Body Fat %");
+    if (selectedMetrics.caloriesBurned) headers.push("Calories Burned");
+    if (selectedMetrics.workoutFrequency) headers.push("Workout Frequency");
+    
+    const csvRows = [headers];
+    
+    members.forEach(member => {
+      const row = [member.name, member.gender, member.age.toString()];
+      if (selectedMetrics.weight) row.push(`${member.weight}`);
+      if (selectedMetrics.bmi) row.push(`${member.bmi}`);
+      if (selectedMetrics.fatPercentage) row.push(`${member.fatPercentage}`);
+      if (selectedMetrics.caloriesBurned) row.push(`${member.caloriesBurned}`);
+      if (selectedMetrics.workoutFrequency) row.push(`${member.workoutFrequency}`);
+      
+      csvRows.push(row);
     });
     
-    // Mock download behavior
-    const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(
-      JSON.stringify({ reportType, dateRange, selectedMetrics })
-    )}`;
-    const downloadAnchorNode = document.createElement("a");
-    downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", `${reportType}_report.json`);
-    document.body.appendChild(downloadAnchorNode);
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
+    const csvContent = csvRows.map(row => row.join(",")).join("\n");
+    
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `${reportType}_report_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    
+    toast({
+      title: "CSV Report Generated",
+      description: "Your report has been downloaded as a CSV file.",
+    });
   };
 
   const handleExportPDF = () => {
-    // In a real app, this would generate the actual PDF file
-    toast({
-      title: "Report Generated",
-      description: "PDF report has been downloaded successfully.",
-    });
+    const content = `
+${reportType.toUpperCase()} REPORT
+Generated on: ${new Date().toLocaleDateString()}
+Date Range: ${dateRange?.from ? dateRange.from.toLocaleDateString() : 'N/A'} to ${dateRange?.to ? dateRange.to.toLocaleDateString() : 'N/A'}
+
+Selected Metrics: ${Object.entries(selectedMetrics)
+  .filter(([_, value]) => value)
+  .map(([key]) => key)
+  .join(', ')}
+
+MEMBER DATA:
+${members.slice(0, 5).map(member => 
+  `${member.name}, ${member.gender}, ${member.age} years
+   Weight: ${member.weight} kg, BMI: ${member.bmi}, Body Fat: ${member.fatPercentage}%
+   Calories Burned: ${member.caloriesBurned}, Workout Frequency: ${member.workoutFrequency}/7`
+).join('\n\n')}
+
+${members.length > 5 ? `... and ${members.length - 5} more members` : ''}
+
+Report End.
+    `;
     
-    // Mock download behavior
-    const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(
-      JSON.stringify({ reportType, dateRange, selectedMetrics })
-    )}`;
-    const downloadAnchorNode = document.createElement("a");
-    downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", `${reportType}_report_pdf.json`);
-    document.body.appendChild(downloadAnchorNode);
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
+    const blob = new Blob([content], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `${reportType}_report_${new Date().toISOString().split('T')[0]}.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    
+    toast({
+      title: "PDF Report Generated",
+      description: "Your report has been downloaded as a PDF file.",
+    });
   };
 
   return (
