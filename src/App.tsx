@@ -1,4 +1,5 @@
-
+import { useEffect, useState } from "react";
+import { loadMembersFromCSV } from "./services/gymDataService";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,6 +18,25 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const App = () => {
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        await loadMembersFromCSV("/members.csv"); // Load the CSV file
+        setIsDataLoaded(true);
+      } catch (error) {
+        console.error("Error loading CSV data:", error);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  if (!isDataLoaded) {
+    return <div>Loading data...</div>; // Show a loading state until data is loaded
+  }
+
   // Check for saved theme preference or use system preference
   const getInitialTheme = (): "light" | "dark" => {
     const savedTheme = localStorage.getItem("theme");

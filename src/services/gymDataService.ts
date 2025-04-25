@@ -1,3 +1,4 @@
+import Papa from "papaparse";
 
 export type Member = {
   id: number;
@@ -53,71 +54,97 @@ const calculateBMI = (weight: number, height: number): number => {
   return Number((weight / (heightInMeters * heightInMeters)).toFixed(1));
 };
 
-// Generate mock members data
-const generateMembers = (count: number): Member[] => {
-  const members: Member[] = [];
+let members: Member[] = [];
 
-  const maleFirstNames = ["James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph", "Thomas", "Charles"];
-  const femaleFirstNames = ["Mary", "Patricia", "Jennifer", "Linda", "Elizabeth", "Barbara", "Susan", "Jessica", "Sarah", "Karen"];
-  const lastNames = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Miller", "Davis", "Garcia", "Rodriguez", "Wilson"];
+// Function to load and parse the CSV file
+export const validateMemberData = (row: any): Member | null => {
+  try {
+    const id = Number(row.id);
+    const name = row.name;
+    const age = Number(row.age);
+    const gender = row.gender as "Male" | "Female";
+    const weight = Number(row.weight);
+    const height = Number(row.height);
+    const bmi = Number(row.bmi);
+    const membershipType = row.membershipType as "Basic" | "Premium" | "VIP";
+    const visitFrequency = Number(row.visitFrequency);
+    const caloriesBurned = Number(row.caloriesBurned);
+    const workoutType = row.workoutType;
+    const waterIntake = Number(row.waterIntake);
+    const restingBPM = Number(row.restingBPM);
+    const maxBPM = Number(row.maxBPM);
+    const avgBPM = Number(row.avgBPM);
+    const fatPercentage = Number(row.fatPercentage);
+    const workoutFrequency = Number(row.workoutFrequency);
+    const joinDate = row.joinDate;
 
-  for (let i = 1; i <= count; i++) {
-    const gender = Math.random() > 0.5 ? 'Male' : 'Female';
-    const firstName = gender === 'Male' 
-      ? maleFirstNames[Math.floor(Math.random() * maleFirstNames.length)]
-      : femaleFirstNames[Math.floor(Math.random() * femaleFirstNames.length)];
-    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-    
-    const age = random(18, 65);
-    const weight = random(50, 120);
-    const height = random(150, 200);
-    const bmi = calculateBMI(weight, height);
-    const workoutFrequency = random(1, 7);
-    
-    members.push({
-      id: i,
-      name: `${firstName} ${lastName}`,
+    if (
+      isNaN(id) || !name || isNaN(age) || !gender || isNaN(weight) || isNaN(height) ||
+      isNaN(bmi) || !membershipType || isNaN(visitFrequency) || isNaN(caloriesBurned) ||
+      !workoutType || isNaN(waterIntake) || isNaN(restingBPM) || isNaN(maxBPM) ||
+      isNaN(avgBPM) || isNaN(fatPercentage) || isNaN(workoutFrequency) || !joinDate
+    ) {
+      return null;
+    }
+
+    return {
+      id,
+      name,
       age,
       gender,
       weight,
       height,
       bmi,
-      membershipType: randomMembershipType(),
-      visitFrequency: random(1, 7),
-      caloriesBurned: random(100, 1000),
-      workoutType: randomWorkoutType(),
-      waterIntake: random(1, 5),
-      restingBPM: random(50, 90),
-      maxBPM: random(120, 180),
-      avgBPM: random(70, 110),
-      fatPercentage: random(10, 35),
+      membershipType,
+      visitFrequency,
+      caloriesBurned,
+      workoutType,
+      waterIntake,
+      restingBPM,
+      maxBPM,
+      avgBPM,
+      fatPercentage,
       workoutFrequency,
-      joinDate: randomDate()
-    });
+      joinDate,
+    };
+  } catch {
+    return null;
   }
-
-  return members;
 };
 
-// Mock data service
-const mockMembers = generateMembers(50);
+export const loadMembersFromCSV = (csvFilePath: string): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    Papa.parse(csvFilePath, {
+      download: true,
+      header: true, // Parse the CSV as an array of objects
+      complete: (result) => {
+        members = result.data
+          .map((row: any) => validateMemberData(row))
+          .filter((member): member is Member => member !== null);
+        resolve();
+      },
+      error: (error) => reject(error),
+    });
+  });
+};
 
+// Update the existing functions to use the `members` array
 export const gymDataService = {
-  getMembers: () => mockMembers,
-  
+  getMembers: () => members,
+
   getMemberById: (id: number) => 
-    mockMembers.find(member => member.id === id),
+    members.find(member => member.id === id),
   
   getAggregatedStats: () => {
-    const totalMembers = mockMembers.length;
-    const avgWeight = Number((mockMembers.reduce((sum, member) => sum + member.weight, 0) / totalMembers).toFixed(1));
-    const avgBmi = Number((mockMembers.reduce((sum, member) => sum + member.bmi, 0) / totalMembers).toFixed(1));
-    const avgCaloriesBurned = Number((mockMembers.reduce((sum, member) => sum + member.caloriesBurned, 0) / totalMembers).toFixed(0));
-    const avgVisitFrequency = Number((mockMembers.reduce((sum, member) => sum + member.visitFrequency, 0) / totalMembers).toFixed(1));
+    const totalMembers = members.length;
+    const avgWeight = Number((members.reduce((sum, member) => sum + member.weight, 0) / totalMembers).toFixed(1));
+    const avgBmi = Number((members.reduce((sum, member) => sum + member.bmi, 0) / totalMembers).toFixed(1));
+    const avgCaloriesBurned = Number((members.reduce((sum, member) => sum + member.caloriesBurned, 0) / totalMembers).toFixed(0));
+    const avgVisitFrequency = Number((members.reduce((sum, member) => sum + member.visitFrequency, 0) / totalMembers).toFixed(1));
     
     // Count workout types
     const workoutTypeCounts: { [key: string]: number } = {};
-    mockMembers.forEach(member => {
+    members.forEach(member => {
       workoutTypeCounts[member.workoutType] = (workoutTypeCounts[member.workoutType] || 0) + 1;
     });
     
@@ -144,7 +171,7 @@ export const gymDataService = {
   getWorkoutTypeDistribution: () => {
     const distribution: { [key: string]: number } = {};
     
-    mockMembers.forEach(member => {
+    members.forEach(member => {
       distribution[member.workoutType] = (distribution[member.workoutType] || 0) + 1;
     });
     
@@ -152,8 +179,8 @@ export const gymDataService = {
   },
   
   getGenderDistribution: () => {
-    const maleCount = mockMembers.filter(member => member.gender === 'Male').length;
-    const femaleCount = mockMembers.filter(member => member.gender === 'Female').length;
+    const maleCount = members.filter(member => member.gender === 'Male').length;
+    const femaleCount = members.filter(member => member.gender === 'Female').length;
     
     return [
       { name: 'Male', value: maleCount },
@@ -170,7 +197,7 @@ export const gymDataService = {
       '56+': 0
     };
     
-    mockMembers.forEach(member => {
+    members.forEach(member => {
       if (member.age >= 18 && member.age <= 25) ageGroups['18-25']++;
       else if (member.age >= 26 && member.age <= 35) ageGroups['26-35']++;
       else if (member.age >= 36 && member.age <= 45) ageGroups['36-45']++;
@@ -184,7 +211,7 @@ export const gymDataService = {
   getCaloriesByWorkoutType: () => {
     const caloriesByType: { [key: string]: { total: number, count: number } } = {};
     
-    mockMembers.forEach(member => {
+    members.forEach(member => {
       if (!caloriesByType[member.workoutType]) {
         caloriesByType[member.workoutType] = { total: 0, count: 0 };
       }
@@ -207,7 +234,7 @@ export const gymDataService = {
       '56+': { total: 0, count: 0 }
     };
     
-    mockMembers.forEach(member => {
+    members.forEach(member => {
       if (member.age >= 18 && member.age <= 25) {
         bmiByAge['18-25'].total += member.bmi;
         bmiByAge['18-25'].count++;
@@ -237,7 +264,7 @@ export const gymDataService = {
   // Generate mock progress data for member over time (last 6 months)
   getMemberProgress: (memberId: number) => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-    const member = mockMembers.find(m => m.id === memberId);
+    const member = members.find(m => m.id === memberId);
     
     if (!member) return [];
     
@@ -267,7 +294,7 @@ export const gymDataService = {
   
   // For goal setting feature (mock)
   getMemberGoals: (memberId: number) => {
-    const member = mockMembers.find(m => m.id === memberId);
+    const member = members.find(m => m.id === memberId);
     if (!member) return [];
     
     // Generate random goals based on member data
